@@ -1,0 +1,18 @@
+---
+# defaults file for borg_server
+
+borg_server_version: 1.4.5
+
+borg_server_binary_url: https://github.com/borgbackup/borg/releases/download/{{ borg_server_version }}/borg-linux-glibc235-x86_64-gh
+
+borg_server_home: /srv/borg
+
+borg_server_repos: []
+  # - host: web.example.com
+  #   key: ssh-ed25519 somekey root@web.example.com
+
+borg_server_check_path: /usr/local/bin/borg-check
+
+borg_server_check_timer: "*-*-* 12:00:00"
+
+borg_server_encryption_passphrase: ""

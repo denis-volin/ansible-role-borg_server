@@ -1,0 +1,15 @@
+galaxy_info:
+  role_name: borg_server
+  description: Set up Borg server
+  author: denis-volin
+  license: MIT
+
+  min_ansible_version: "2.15.0"
+
+  platforms:
+    - name: Debian
+      versions:
+        - bookworm
+        - trixie
+
+  galaxy_tags: []

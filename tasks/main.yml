@@ -1,0 +1,58 @@
+---
+# tasks file for borg_server
+- name: Install Borg standalone binary
+  ansible.builtin.get_url:
+    url: "{{ borg_server_binary_url }}"
+    dest: /usr/local/bin/borg
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Create Borg user
+  ansible.builtin.user:
+    name: borg
+    home: "{{ borg_server_home }}"
+    shell: /bin/bash
+    skeleton: /dev/null
+    system: true
+
+- name: Create repo directores
+  ansible.builtin.file:
+    path: "{{ borg_server_home }}/repos/{{ item.host }}"
+    state: directory
+    owner: borg
+    group: borg
+    mode: "0750"
+  loop: "{{ borg_server_repos }}"
+
+- name: Add authorized SSH keys to Borg user
+  ansible.posix.authorized_key:
+    user: borg
+    key: "{{ item.key }}"
+    key_options: command="cd {{ borg_server_home }}/repos/{{ item.host }}; borg serve --restrict-to-path {{ borg_server_home }}/repos/{{ item.host }}",restrict
+  loop: "{{ borg_server_repos }}"
+
+- name: Copy Borg check script
+  ansible.builtin.template:
+    src: borg-check.sh.j2
+    dest: "{{ borg_server_check_path }}"
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: Copy systemd service and timer
+  ansible.builtin.template:
+    src: borg-check.{{ item }}.j2
+    dest: /etc/systemd/system/borg-check.{{ item }}
+    owner: root
+    group: root
+    mode: "0644"
+  loop: [service, timer]
+
+- name: Start and enable borg-check.timer
+  ansible.builtin.systemd:
+    name: borg-check.timer
+    state: started
+    enabled: true
+    daemon_reload: true
+  ignore_errors: "{{ ansible_check_mode }}"

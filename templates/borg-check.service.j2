@@ -1,0 +1,9 @@
+[Unit]
+Description=Check borg repos for fresh backups
+
+[Service]
+Type=oneshot
+ExecStart={{ borg_server_check_path }}
+
+[Install]
+WantedBy=multi-user.target

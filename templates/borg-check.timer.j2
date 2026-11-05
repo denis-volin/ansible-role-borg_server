@@ -1,0 +1,8 @@
+[Unit]
+Description=Check borg repos for fresh backups
+
+[Timer]
+OnCalendar={{ borg_server_check_timer }}
+
+[Install]
+WantedBy=timers.target

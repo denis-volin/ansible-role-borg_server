@@ -1,0 +1,18 @@
+#!/bin/bash
+
+export BORG_PASSPHRASE="{{ borg_server_encryption_passphrase }}"
+
+DIR="{{ borg_server_home }}/repos"
+I=0
+
+for REPO in "$DIR"/*/; do
+  LAST_ARCHIVE="$(borg list --last 1 --format '{end}' "$REPO/repo")"
+  if [ "$(date -d "48 hours ago" +%s)" -gt "$(date -d "$LAST_ARCHIVE" +%s)" ]; then
+    echo "Repo $REPO: last backup was more than 2 days ago at $LAST_ARCHIVE"
+    I=$(( I + 1 ))
+  else
+    echo "Repo $REPO: OK ($LAST_ARCHIVE)"
+  fi
+done
+
+exit $I
